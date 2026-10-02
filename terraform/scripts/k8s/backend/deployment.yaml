@@ -5,6 +5,8 @@ metadata:
 data:
   APP_ENV: "production"
   BACKEND_URL: "http://backend-service:8080"
+  DB_HOST: host.minikube.internal
+  DB_PORT: "3310"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,6 +24,12 @@ spec:
       labels:
         app: backend
     spec:
+      # Mapeia host.minikube.internal diretamente para o IP do Host
+      hostAliases:
+        - ip: "${HOST_IP}"
+          hostnames:
+            - "host.minikube.internal"
+
       containers:
         - name: backend-container
           image: fieclab/fieclab-backend:latest
@@ -31,6 +39,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: app-config
+            - secretRef:
+                name: firebase-secret
+                
           resources:
             requests:
               cpu: "100m"
@@ -44,7 +55,7 @@ kind: Service
 metadata:
   name: backend-service
 spec:
-  type: ClusterIP
+  type: NodePort  # <-- Alterado de ClusterIP para NodePort
   selector:
     app: backend
   ports:
@@ -70,50 +81,3 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend-deployment
-  labels:
-    app: frontend
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-        - name: frontend-container
-          image: fieclab/fiecpa2026:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          envFrom:
-            - configMapRef:
-                name: app-config
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "250m"
-              memory: "256Mi"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-spec:
-  type: NodePort
-  selector:
-    app: frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30080
