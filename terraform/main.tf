@@ -1,4 +1,4 @@
-# Criação do cluster Minikube com os novos parâmetros
+# 1. Criação do cluster Minikube
 resource "minikube_cluster" "custom_cluster" {
   cluster_name       = var.cluster_name
   driver             = var.driver
@@ -12,7 +12,7 @@ resource "minikube_cluster" "custom_cluster" {
   addons             = var.addons
 }
 
-# Salva os dados de saída em um arquivo local em formato JSON
+# 2. Salva os dados de saída em um arquivo JSON local
 resource "local_file" "outputs_file" {
   filename = "${path.module}/cluster_outputs.json"
   content = jsonencode({
@@ -24,11 +24,12 @@ resource "local_file" "outputs_file" {
   })
 }
 
+# 3. Automação de deploy e port-forward persistente
 resource "null_resource" "k8s_deploy" {
   triggers = {
-    script_hash = filemd5("${path.module}/scripts/deploy.sh") # Corrigido aqui
-    backend_manifest   = filemd5("${path.module}/scripts/k8s/backend/deployment.yaml")
-    backend_secret     = filemd5("${path.module}/scripts/k8s/backend/secret.yaml")
+    script_hash      = filemd5("${path.module}/scripts/deploy.sh")
+    backend_manifest = filemd5("${path.module}/scripts/k8s/backend/deployment.yaml")
+    backend_secret   = filemd5("${path.module}/scripts/k8s/backend/secret.yaml")
   }
 
   depends_on = [
@@ -36,6 +37,7 @@ resource "null_resource" "k8s_deploy" {
     local_file.outputs_file
   ]
 
+  # Provisioner 1: Aplica os manifestos via deploy.sh
   provisioner "local-exec" {
     interpreter = ["C:/Program Files/Git/bin/bash.exe", "-c"]
 
@@ -44,5 +46,25 @@ resource "null_resource" "k8s_deploy" {
     }
 
     command = "${path.module}/scripts/deploy.sh ${var.cluster_name}"
+  }
+
+  # Provisioner 2: Aguarda os Pods e inicia o port-forward desacoplado no Windows
+  provisioner "local-exec" {
+    interpreter = ["C:/Program Files/Git/bin/bash.exe", "-c"]
+
+    command = <<EOT
+      echo "⏳ Aguardando o Deployment e os Pods ficarem 100% Ready..."
+      minikube -p ${var.cluster_name} kubectl -- rollout status deployment/backend-deployment --timeout=180s
+
+      echo "🚀 Pods prontos! Iniciando o port-forward persistente..."
+      cmd.exe /c "start /B minikube -p ${var.cluster_name} kubectl -- port-forward service/backend-service --address 0.0.0.0 8080:8080"
+    EOT
+  }
+
+  # Provisioner 3: Encerra o port-forward ao rodar 'terraform destroy'
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["C:/Program Files/Git/bin/bash.exe", "-c"]
+    command     = "taskkill /F /IM kubectl.exe || true"
   }
 }
