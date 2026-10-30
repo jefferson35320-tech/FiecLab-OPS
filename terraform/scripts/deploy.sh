@@ -54,4 +54,4 @@ echo "🚀 Pods prontos! Iniciando o port-forward em background na porta 8080...
 nohup minikube -p ${CLUSTER_NAME} kubectl -- port-forward --address 0.0.0.0 service/backend-service 8080:8080 > /dev/null 2>&1 &
 
 echo "✅ Deploy e Port-Forward concluídos com sucesso!"
-exit 0
+exit 0s

@@ -62,3 +62,44 @@ variable "addons" {
     "storage-provisioner"
   ]
 }
+variable "firebase_api_key" {
+  description = "Chave da API do Firebase para a aplicação frontend"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_auth_domain" {
+  description = "Domínio de autenticação do Firebase"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_project_id" {
+  description = "ID do projeto Firebase"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_storage_bucket" {
+  description = "Bucket de armazenamento do Firebase"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_messaging_sender_id" {
+  description = "ID do remetente de mensagens do Firebase"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_app_id" {
+  description = "ID da aplicação no Firebase"
+  type        = string
+  default     = ""
+}
+
+variable "firebase_measurement_id" {
+  description = "ID de medição do Google Analytics no Firebase"
+  type        = string
+  default     = ""
+}
