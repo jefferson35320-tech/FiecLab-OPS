@@ -90,7 +90,7 @@ resource "null_resource" "k8s_frontend_deploy" {
     interpreter = ["C:/Program Files/Git/bin/bash.exe", "-c"]
 
     command = <<EOT
-      cat <<'EOF' | minikube -p ${var.cluster_name} kubectl -- apply -f -
+      cat <<EOF "-c"| minikube -p ${var.cluster_name} kubectl -- apply -f -
       ${templatefile("${path.module}/scripts/k8s/frontend/deployment.yaml", {
         FIREBASE_API_KEY            = var.firebase_api_key
         FIREBASE_AUTH_DOMAIN        = var.firebase_auth_domain

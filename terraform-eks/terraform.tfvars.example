@@ -1,0 +1,19 @@
+# Copie para terraform.tfvars e ajuste. O terraform.tfvars é ignorado pelo git.
+
+aws_region   = "us-east-1"
+cluster_name = "fieclab-eks"
+
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+
+backend_image  = "fieclab/fieclab-backend:latest"
+frontend_image = "fieclab/fieclab-frontend:latest"
+
+# Coloque o serviceAccountKey.json do Firebase nesta pasta (terraform-eks/)
+firebase_credentials_file = "serviceAccountKey.json"
+
+# Opcionais
+# google_client_id     = ""
+# google_client_secret = ""
+# jwt_secret           = ""
+# frontend_oauth2_redirect_uri = "http://<url-do-frontend>/oauth2/redirect"

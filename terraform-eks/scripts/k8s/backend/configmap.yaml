@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_ENV: "production"
+  BACKEND_URL: "http://backend-service:8080"
+  # Antes: host.minikube.internal:3310 — agora o endpoint do RDS
+  DB_HOST: "${DB_HOST}"
+  DB_PORT: "${DB_PORT}"
+  FRONTEND_OAUTH2_REDIRECT_URI: "${FRONTEND_OAUTH2_REDIRECT_URI}"
