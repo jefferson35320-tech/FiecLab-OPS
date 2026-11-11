@@ -5,7 +5,7 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -36,10 +36,10 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "128Mi"
+              memory: "256Mi"
             limits:
               cpu: "500m"
-              memory: "512Mi"
+              memory: "1024Mi"
           # Probes TCP na 8080: na imagem atual o Actuator fica na 8080 atrás do
           # Spring Security (HTTP 401), e a porta 9090 de management não existe.
           # O Tomcat só abre a 8080 depois que a aplicação subiu e conectou no banco.
@@ -81,8 +81,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: backend-deployment
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 3
   metrics:
     - type: Resource
       resource:
