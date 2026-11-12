@@ -3,7 +3,7 @@
 # DEPLOY DO BACKEND
 # Variáveis extras (passadas pelo Terraform):
 #   BACKEND_IMAGE, DB_HOST, DB_PORT, SECRETS_FILE, FIREBASE_CREDENTIALS_FILE,
-#   FRONTEND_OAUTH2_REDIRECT_URI (opcional)
+#   BACKEND_NODE_PORT, API_GATEWAY_URL, FRONTEND_OAUTH2_REDIRECT_URI (opcional)
 # --------------------------------------------------
 source "$(dirname "$0")/common.sh"
 
@@ -12,7 +12,9 @@ source "$(dirname "$0")/common.sh"
 : "${DB_PORT:=3306}"
 : "${SECRETS_FILE:=.deploy-secrets.env}"
 : "${FIREBASE_CREDENTIALS_FILE:=serviceAccountKey.json}"
-export BACKEND_IMAGE DB_HOST DB_PORT
+: "${BACKEND_NODE_PORT:=30808}"
+: "${API_GATEWAY_URL:?API_GATEWAY_URL não definido}"
+export BACKEND_IMAGE DB_HOST DB_PORT BACKEND_NODE_PORT
 
 setup_kubeconfig
 
@@ -33,12 +35,9 @@ source "${SECRETS_FILE}"
 set +a
 
 # --------------------------------------------------
-# REDIRECT DO OAUTH2 (padrão: URL do Load Balancer do frontend)
+# REDIRECT DO OAUTH2 (o Terraform já calcula: frontend no API Gateway)
 # --------------------------------------------------
-if [ -z "${FRONTEND_OAUTH2_REDIRECT_URI:-}" ]; then
-  FRONTEND_HOST=$(wait_lb_hostname frontend-service)
-  FRONTEND_OAUTH2_REDIRECT_URI="http://${FRONTEND_HOST}/oauth2/redirect"
-fi
+: "${FRONTEND_OAUTH2_REDIRECT_URI:?FRONTEND_OAUTH2_REDIRECT_URI não definido}"
 export FRONTEND_OAUTH2_REDIRECT_URI
 echo "📌 Banco: ${DB_HOST}:${DB_PORT} | OAuth2 redirect: ${FRONTEND_OAUTH2_REDIRECT_URI}"
 
@@ -68,13 +67,13 @@ echo "🚀 Aplicando manifestos do Backend..."
 printf '%s\n' "${CONFIG_YAML}"   | k apply -f -
 printf '%s\n' "${SECRET_YAML}"   | k apply -f -
 printf '%s\n' "${OPTIONAL_YAML}" | k apply -f -
-envsubst '${BACKEND_IMAGE} ${CONFIG_HASH}' < scripts/k8s/backend/deployment.yaml | k apply -f -
+envsubst '${BACKEND_IMAGE} ${CONFIG_HASH} ${BACKEND_NODE_PORT}' < scripts/k8s/backend/deployment.yaml | k apply -f -
 
 echo "⏳ Aguardando o Backend ficar 100% Ready..."
 k rollout status deployment/backend-deployment --timeout=600s
 
-BACKEND_HOST=$(wait_lb_hostname backend-service)
-BACKEND_URL="http://${BACKEND_HOST}:8080"
+# Entrada pública do backend: API Gateway -> VPC Link -> NLB interno -> NodePort
+BACKEND_URL="${API_GATEWAY_URL}"
 
 echo "✅ Backend disponível em: ${BACKEND_URL}"
 echo ""

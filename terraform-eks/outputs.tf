@@ -30,6 +30,16 @@ output "app_urls_command" {
   value       = "kubectl --kubeconfig .kube/config -n ${var.namespace} get svc"
 }
 
+output "frontend_url" {
+  description = "URL pública do frontend (API Gateway)"
+  value       = local.frontend_public_url
+}
+
+output "backend_api_url" {
+  description = "URL pública do backend (API Gateway). Use como REACT_APP_API_URL no frontend"
+  value       = local.backend_public_url
+}
+
 # --------------------------------------------------
 # BANCO DE DADOS
 # --------------------------------------------------

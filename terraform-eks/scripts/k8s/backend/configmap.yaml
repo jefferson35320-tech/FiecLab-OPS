@@ -9,3 +9,7 @@ data:
   DB_HOST: "${DB_HOST}"
   DB_PORT: "${DB_PORT}"
   FRONTEND_OAUTH2_REDIRECT_URI: "${FRONTEND_OAUTH2_REDIRECT_URI}"
+  # Atrás do API Gateway (prefixo /fieclab, https): o Spring usa os cabeçalhos
+  # enviados pela integração para montar URLs públicas corretas (Swagger etc.)
+  SERVER_FORWARD_HEADERS_STRATEGY: "framework"
+  SERVER_TOMCAT_REMOTEIP_PROTOCOL_HEADER: "X-Fieclab-Proto"

@@ -64,13 +64,16 @@ kind: Service
 metadata:
   name: backend-service
 spec:
-  type: LoadBalancer # Na AWS cria um Load Balancer público (substitui o port-forward 8080)
+  # NodePort fixo: o NLB interno do API Gateway encaminha para esta porta nos nós.
+  # O backend não tem mais Load Balancer público; a entrada é só pelo API Gateway.
+  type: NodePort
   selector:
     app: backend
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      nodePort: ${BACKEND_NODE_PORT}
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

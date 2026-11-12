@@ -130,6 +130,42 @@ variable "frontend_image" {
   default     = "fieclab/fieclab-frontend:latest"
 }
 
+variable "api_gateway_id" {
+  type        = string
+  description = "ID do HTTP API do API Gateway (já existente) que fica na frente do backend"
+  default     = "o3l1ibqnmb"
+}
+
+variable "api_gateway_fieclab_route_id" {
+  type        = string
+  description = "ID da rota \"ANY /fieclab\" já criada no API Gateway (importada pelo Terraform). Vazio = o Terraform cria a rota"
+  default     = ""
+}
+
+variable "frontend_api_gateway_id" {
+  type        = string
+  description = "ID do HTTP API do API Gateway (já existente) que fica na frente do frontend"
+  default     = "l7qnejkr6i"
+}
+
+variable "frontend_api_gateway_fieclab_route_id" {
+  type        = string
+  description = "ID da rota \"ANY /fieclab\" já criada no API Gateway do frontend (importada pelo Terraform). Vazio = o Terraform cria a rota"
+  default     = "cqwpulh"
+}
+
+variable "frontend_node_port" {
+  type        = number
+  description = "NodePort fixo do frontend-service (faixa 30000-32767)"
+  default     = 30880
+}
+
+variable "backend_node_port" {
+  type        = number
+  description = "NodePort fixo do backend-service (o NLB interno do API Gateway aponta para ele; faixa 30000-32767)"
+  default     = 30808
+}
+
 variable "firebase_credentials_file" {
   type        = string
   description = "Caminho do serviceAccountKey.json do Firebase (relativo a esta pasta)"
@@ -138,7 +174,7 @@ variable "firebase_credentials_file" {
 
 variable "frontend_oauth2_redirect_uri" {
   type        = string
-  description = "URL de redirect do OAuth2 após login. Vazio = usa a URL do Load Balancer do frontend"
+  description = "URL de redirect do OAuth2 após login. Vazio = <URL do frontend no API Gateway>/oauth2/redirect"
   default     = ""
 }
 

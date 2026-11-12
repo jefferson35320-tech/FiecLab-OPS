@@ -5,3 +5,7 @@ terraform/.terraform.lock.hcl
 **/*.json
 **/*.out
 **/*.tfvars
+**/*.docs
+terraform-eks/docs/
+terraform-eks/.deploy-secrets.env
+*.env

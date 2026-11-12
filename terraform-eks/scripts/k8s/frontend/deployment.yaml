@@ -40,10 +40,13 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: LoadBalancer # Substitui o port-forward 3000:80
+  # NodePort fixo: o NLB interno do API Gateway encaminha para esta porta nos nós.
+  # O frontend não tem mais Load Balancer público; a entrada é só pelo API Gateway.
+  type: NodePort
   selector:
     app: frontend
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
+      nodePort: ${FRONTEND_NODE_PORT}
