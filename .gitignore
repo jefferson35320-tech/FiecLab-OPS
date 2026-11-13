@@ -1,11 +1,11 @@
 terraform/.terraform
 terraform/.terraform.lock.hcl
+terraform-eks/.terraform
+terraform-eks/.terraform.lock.hcl
+terraform-eks/.kube
 **/*.tfstate
 **/*.tfstate.backup
 **/*.json
 **/*.out
 **/*.tfvars
-**/*.docs
-terraform-eks/docs/
-terraform-eks/.deploy-secrets.env
-*.env
+

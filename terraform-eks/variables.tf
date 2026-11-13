@@ -151,7 +151,7 @@ variable "frontend_api_gateway_id" {
 variable "frontend_api_gateway_fieclab_route_id" {
   type        = string
   description = "ID da rota \"ANY /fieclab\" já criada no API Gateway do frontend (importada pelo Terraform). Vazio = o Terraform cria a rota"
-  default     = "cqwpulh"
+  default     = ""
 }
 
 variable "frontend_node_port" {
